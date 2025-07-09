@@ -25,10 +25,8 @@ function getAllConnectedClients(roomId) {
         }
     );
 }
-
+// joining on server then linstining on frontend on this backend url 
 io.on('connection', (socket) => {
-    console.log('socket connected', socket.id);
-
     socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
         userSocketMap[socket.id] = username;
         socket.join(roomId);
@@ -41,14 +39,18 @@ io.on('connection', (socket) => {
             });
         });
     });
-
+    // for real time reflection code change on other editor for that at the place io.on we use socket.in means except me all other clients
     socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
         socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
     });
 
+    // syncing code at starting time
+
     socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
         io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
     });
+
+    //  at the time of disconnectiong of socket
 
     socket.on('disconnecting', () => {
         const rooms = [...socket.rooms];

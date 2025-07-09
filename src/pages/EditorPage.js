@@ -1,15 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import {
+    Navigate,
+    useLocation,
+    useNavigate,
+    useParams,
+} from 'react-router-dom';
 import ACTIONS from '../Actions';
 import Client from '../components/Client';
 import Editor from '../components/Editor';
 import { initSocket } from '../socket';
-import {
-    useLocation,
-    useNavigate,
-    Navigate,
-    useParams,
-} from 'react-router-dom';
 
 const EditorPage = () => {
     const socketRef = useRef(null);
@@ -45,6 +45,7 @@ const EditorPage = () => {
                         console.log(`${username} joined`);
                     }
                     setClients(clients);
+                    // after joining the room sync the code
                     socketRef.current.emit(ACTIONS.SYNC_CODE, {
                         code: codeRef.current,
                         socketId,
@@ -66,6 +67,7 @@ const EditorPage = () => {
             );
         };
         init();
+        // below is the cleneanup function 
         return () => {
             socketRef.current.disconnect();
             socketRef.current.off(ACTIONS.JOINED);
